@@ -1,0 +1,30 @@
+{
+  "name": "Zephyr Lab",
+  "dockerFile": "Dockerfile.devel",
+
+  "runArgs": [
+  "--privileged"
+  ],
+
+  // "mounts": [
+  //   "source=/dev/bus/usb/,target=/dev/bus/usb/,type=bind"
+  // ],
+
+  "workspaceMount": "source=${localWorkspaceFolder},target=/home/ubuntu/workspace,type=bind",
+  "workspaceFolder": "/home/ubuntu/workspace",
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux" : "bash",
+        "extensions.ignoreRecommendations": true
+      },
+      "extensions": [
+        "ms-vscode.cpptools",
+        "marus25.cortex-debug",
+        "mcu-debug.debug-tracker-vscode",
+        "mhutchie.git-graph"
+      ]
+    }
+  } 
+}
