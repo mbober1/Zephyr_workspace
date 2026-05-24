@@ -8,12 +8,15 @@ manifest:
   remotes:
     - name: mbober
       url-base: https://github.com/mbober1
+    - name: upstream
+      url-base: https://github.com/zephyrproject-rtos
 
   projects:
     - name: zephyr
-      remote: mbober
+      remote: upstream
       repo-path: zephyr
-      revision: main
+      revision: v4.4.0
+      clone-depth: 1
       import:
         name-allowlist:
           - cmsis

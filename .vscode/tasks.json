@@ -8,14 +8,14 @@
 			"command": "west",
 			"args": [
 				"build",
-				"-b", "microspora",
+				// "-b", "microspora",
+				"-b", "weact_stm32g431_core",
 				"${workspaceFolder}/app",
-				"-DBOARD_ROOT=${workspaceFolder}",
-				// "-b", "weact_stm32g431_core",
+				// "-DBOARD_ROOT=${workspaceFolder}",
 				// "${workspaceFolder}/zephyr/samples/subsys/usb_c/sink",
-				"-DZEPHYR_BASE=${workspaceFolder}/zephyr",
-				"-DDTC_OVERLAY_FILE=${workspaceFolder}/zephyr/samples/subsys/logging/logger/segger_uart_rtt.overlay",
-				"-DEXTRA_CONF_FILE=${workspaceFolder}/zephyr/snippets/rtt-console/rtt-console.conf"
+				// "-DZEPHYR_BASE=${workspaceFolder}/zephyr",
+				// "-DDTC_OVERLAY_FILE=${workspaceFolder}/zephyr/samples/subsys/logging/logger/segger_uart_rtt.overlay",
+				// "-DEXTRA_CONF_FILE=${workspaceFolder}/zephyr/snippets/rtt-console/rtt-console.conf"
 			],
 			"problemMatcher": [
 				"$gcc"

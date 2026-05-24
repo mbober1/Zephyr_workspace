@@ -1,7 +1,7 @@
-FROM ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0 AS base
+FROM ubuntu:24.04@sha256:c4a8d5503dfb2a3eb8ab5f807da5bc69a85730fb49b5cfca2330194ebcc41c7b AS base
 
 ENV TOOLCHAIN="arm-zephyr-eabi"
-ENV ZSDK_VERSION="0.17.4"
+ENV ZSDK_VERSION="1.0.1"
 ARG ZEPHYR_SDK_DIR="/opt"
 ENV ZEPHYR_SDK=${ZEPHYR_SDK_DIR}/zephyr-sdk-${ZSDK_VERSION}
 ENV DEBIAN_FRONTEND=noninteractive
@@ -48,11 +48,10 @@ RUN ./setup.sh -t ${TOOLCHAIN} -h
 
 
 
-FROM base
+FROM base AS final
 ARG UID=1000
 ARG GID=1000
 ARG USERNAME="ubuntu"
-ENV DEBIAN_FRONTEND=noninteractive
 ENV ZEPHYR_BASE=/home/${USERNAME}/workspace/zephyr
 ENV PATH="${ZEPHYR_BASE}/scripts:${PATH}"
 
@@ -87,7 +86,7 @@ RUN apt-get -y update && \
 		locales \
 		udev \
 		wget \
-		openocd \
+		picocom \
 		&& \
 	apt-get clean -y && \
 	apt-get autoremove --purge -y && \
@@ -100,33 +99,22 @@ ENV LC_ALL=en_US.UTF-8
 RUN locale-gen $LANG
 
 # Install Python dependencies
-RUN	pip3 install --no-cache-dir \
+RUN	pip3 install --no-cache-dir --break-system-packages \
 		-r https://raw.githubusercontent.com/zephyrproject-rtos/zephyr/main/scripts/requirements.txt \
 		-r https://raw.githubusercontent.com/zephyrproject-rtos/mcuboot/main/scripts/requirements.txt \
 		GitPython imgtool junitparser junit2html numpy protobuf PyGithub \
 		pylint sh statistics west \
-		nrf-regtool~=7.0.0 jsonschema && \
-	pip3 check
-
-
-# Hack udev to run inside a container
-RUN sed -i.bak -e '/if \[ ! -w \/sys \]/,+3 s/^/#/' /etc/init.d/udev
+		nrf-regtool~=7.0.0 jsonschema
 
 # Add zephyr SDK
 COPY --from=step-sdk /opt/zephyr-sdk-${ZSDK_VERSION} /opt/zephyr-sdk-${ZSDK_VERSION}
 
-# install OpenOCD udev rules
-RUN cp ${ZEPHYR_SDK}/sysroots/x86_64-pokysdk-linux/usr/share/openocd/contrib/60-openocd.rules /etc/udev/rules.d
-
 # Install Jlink
 RUN wget -q --post-data "accept_license_agreement=accepted" https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb && \
+	/lib/systemd/systemd-udevd -d && \
 	dpkg -i ./JLink_Linux_x86_64.deb && \
 	rm ./JLink_Linux_x86_64.deb
 
 
-RUN groupadd -r ${USERNAME} && useradd -m -s /bin/bash -r -g ${USERNAME} ${USERNAME}
 USER ${USERNAME}
 WORKDIR /home/${USERNAME}/workspace
-# RUN usermod -a -G dialout ${USERNAME}
-# RUN usermod -a -G plugdev ${USERNAME}
-# WORKDIR /home/${USERNAME}/workspace
