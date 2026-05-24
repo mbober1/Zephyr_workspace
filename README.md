@@ -1,4 +1,5 @@
 # My Zephyr workspace
+[![.github/workflows/build.yml](https://github.com/mbober1/ZephyrOS_workspace/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/mbober1/ZephyrOS_workspace/actions/workflows/build.yml)
 
 - [x] Devcontainer environment
 - [x] VSCode configs
