@@ -1,0 +1,54 @@
+name: Build firmware
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'app/tests/**'
+  pull_request:
+    paths:
+      - 'app/tests/**'
+
+env:
+  TOOLCHAIN: arm-zephyr-eabi
+  ZSDK_VERSION: 1.0.1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - name: Install deps
+        run: |
+          sudo apt update
+          sudo apt install -y --no-install-recommends \
+            git cmake ninja-build gperf \
+            ccache dfu-util device-tree-compiler \
+            wget python3-dev python3-venv python3-tk \
+            xz-utils file make gcc gcc-multilib \
+            g++-multilib libsdl2-dev libmagic1 \
+            python3-pip python3-setuptools \
+            python3-tk python3-wheel
+
+      - name: Install SDK
+        run: |
+          wget -qO- https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz | tar xJ -C /opt
+          /opt/zephyr-sdk-${ZSDK_VERSION}/setup.sh -t ${TOOLCHAIN} -h
+
+      - name: Install twister
+        run: |
+          pip3 install --no-cache-dir --break-system-packages \
+            -r https://raw.githubusercontent.com/zephyrproject-rtos/zephyr/main/scripts/requirements.txt \
+            -r https://raw.githubusercontent.com/zephyrproject-rtos/mcuboot/main/scripts/requirements.txt \
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup west
+        run: |
+          west init --local app
+          west update
+
+      - name: Build
+        run: |
+          twister -T app
