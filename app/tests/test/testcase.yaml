@@ -1,0 +1,3 @@
+tests:
+  app.test:
+    platform_allow: weact_stm32g431_core

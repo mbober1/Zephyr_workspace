@@ -1,0 +1,6 @@
+- connected: true
+  id: 000261011923
+  platform: weact_stm32g431_core
+  product: J-Link_Linkus
+  runner: jlink
+  serial: /dev/ttyACM0
